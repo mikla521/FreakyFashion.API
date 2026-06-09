@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "FreakyFashion.API": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "scalar",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:52576;http://localhost:52577"
+    }
+  }
+}
