@@ -56,6 +56,8 @@ public class ProductsController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetProduct(int id)
     {
+        _logger.LogInformation("Fetching product with id {id}.", id);
+
         var product = await _db.Products.FindAsync(id);
         if (product is null) return NotFound();
         return Ok(MapToDto(product));
