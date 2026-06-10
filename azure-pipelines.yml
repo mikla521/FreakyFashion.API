@@ -13,22 +13,22 @@ steps:
 
 - checkout: self
 
-# 1. Build image
+# BUILD (kopplad till registry!)
 - task: Docker@2
   displayName: Build image
   inputs:
     command: build
-    repository: $(imageName)
+    repository: $(registry)/$(imageName)
     dockerfile: Dockerfile
     tags: |
       $(tag)
 
-# 2. Push image to ACR
+# PUSH (exakt samma image)
 - task: Docker@2
   displayName: Push image to ACR
   inputs:
     command: push
-    repository: $(imageName)
+    repository: $(registry)/$(imageName)
     containerRegistry: 'mcratzacr'
     tags: |
       $(tag)
