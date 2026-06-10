@@ -1,87 +1,13 @@
 trigger:
-  branches:
-    include:
-      - main
+- master
 
-variables:
-  # Azure Container Registry
-  acrName: 'yourAcrName'
-  acrLoginServer: '$(acrName).azurecr.io'
-  imageRepository: 'freakyfashion-api'
-  dockerfilePath: 'Dockerfile'
-  tag: '$(Build.BuildId)'
+pool:
+  vmImage: 'ubuntu-latest'
 
-  # Azure Web App / Container App
-  azureSubscription: 'your-service-connection-name'
-  containerAppName: 'freakyfashion-api'
-  resourceGroupName: 'freakyfashion-rg'
+steps:
 
-stages:
+- checkout: self
 
-# ── Stage 1: Build & Test ──────────────────────────────────────────────────────
-- stage: Build
-  displayName: 'Build & Test'
-  jobs:
-  - job: BuildAndTest
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: UseDotNet@2
-      inputs:
-        packageType: 'sdk'
-        version: '10.x'
-
-    - script: dotnet restore FreakyFashion.API/FreakyFashion.API.csproj
-      displayName: 'dotnet restore'
-
-    - script: dotnet build FreakyFashion.API/FreakyFashion.API.csproj --configuration Release --no-restore
-      displayName: 'dotnet build'
-
-    - script: dotnet test --configuration Release --no-build --verbosity normal
-      displayName: 'dotnet test'
-      continueOnError: true
-
-# ── Stage 2: Docker build & push to ACR ──────────────────────────────────────
-- stage: Docker
-  displayName: 'Build & Push Docker Image'
-  dependsOn: Build
-  jobs:
-  - job: DockerBuildPush
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-    - task: Docker@2
-      displayName: 'Build and Push to ACR'
-      inputs:
-        command: 'buildAndPush'
-        repository: '$(imageRepository)'
-        dockerfile: '$(dockerfilePath)'
-        containerRegistry: '$(acrName)'
-        tags: |
-          $(tag)
-          latest
-
-# ── Stage 3: Deploy to Azure Container Apps ───────────────────────────────────
-- stage: Deploy
-  displayName: 'Deploy to Azure'
-  dependsOn: Docker
-  jobs:
-  - deployment: DeployToAzure
-    pool:
-      vmImage: 'ubuntu-latest'
-    environment: 'production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: AzureCLI@2
-            displayName: 'Deploy Container App'
-            inputs:
-              azureSubscription: '$(azureSubscription)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                az containerapp update \
-                  --name $(containerAppName) \
-                  --resource-group $(resourceGroupName) \
-                  --image $(acrLoginServer)/$(imageRepository):$(tag)
+- script: |
+    docker build -t freakyfashion-api:test .
+  displayName: 'Build Docker image'
