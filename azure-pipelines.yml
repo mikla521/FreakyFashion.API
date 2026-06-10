@@ -12,22 +12,12 @@ steps:
 
 - checkout: self
 
-# BUILD (utan registry!)
 - task: Docker@2
-  displayName: Build image
+  displayName: Build and push to ACR
   inputs:
-    command: build
+    command: buildAndPush
+    containerRegistry: 'mcratzacr'
     repository: $(imageName)
     dockerfile: Dockerfile
-    tags: |
-      $(tag)
-
-# PUSH (kopplar registry via service connection)
-- task: Docker@2
-  displayName: Push image to ACR
-  inputs:
-    command: push
-    repository: $(imageName)
-    containerRegistry: 'mcratzacr'
     tags: |
       $(tag)
