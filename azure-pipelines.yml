@@ -7,6 +7,7 @@ pool:
 variables:
   imageName: 'freakyfashion-api'
   tag: '$(Build.BuildId)'
+  service: 'azure-freakyfashion'
 
 steps:
 
@@ -21,3 +22,15 @@ steps:
     dockerfile: Dockerfile
     tags: |
       $(tag)
+
+- task: AzureCLI@2
+  displayName: Deploy to Container App
+  inputs:
+    azureSubscription: $(service)
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      az containerapp update \
+        --name freakyfashion-api \
+        --resource-group rg_freakyfashion \
+        --image mcratzacr.azurecr.io/freakyfashion-api:$(tag)
