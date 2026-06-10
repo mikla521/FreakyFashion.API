@@ -6,29 +6,28 @@ pool:
 
 variables:
   imageName: 'freakyfashion-api'
-  registry: 'mcratzacr.azurecr.io'
   tag: '$(Build.BuildId)'
 
 steps:
 
 - checkout: self
 
-# BUILD (kopplad till registry!)
+# BUILD (utan registry!)
 - task: Docker@2
   displayName: Build image
   inputs:
     command: build
-    repository: $(registry)/$(imageName)
+    repository: $(imageName)
     dockerfile: Dockerfile
     tags: |
       $(tag)
 
-# PUSH (exakt samma image)
+# PUSH (kopplar registry via service connection)
 - task: Docker@2
   displayName: Push image to ACR
   inputs:
     command: push
-    repository: $(registry)/$(imageName)
+    repository: $(imageName)
     containerRegistry: 'mcratzacr'
     tags: |
       $(tag)
