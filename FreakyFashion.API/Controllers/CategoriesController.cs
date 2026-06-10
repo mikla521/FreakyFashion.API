@@ -13,10 +13,12 @@ namespace FreakyFashion.API.Controllers;
 [Route("api/categories")]
 public class CategoriesController : ControllerBase
 {
+    private readonly ILogger<CategoriesController> _logger;
     private readonly AppDbContext _db;
 
-    public CategoriesController(AppDbContext db)
+    public CategoriesController(ILogger<CategoriesController> logger, AppDbContext db)
     {
+        _logger = logger;
         _db = db;
     }
 
@@ -24,6 +26,8 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetCategories([FromQuery] string? slug)
     {
+        _logger.LogInformation("Fetching categories.");
+
         var query = _db.Categories.Include(c => c.Products).AsQueryable();
 
         if (slug is not null)

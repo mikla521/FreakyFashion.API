@@ -13,10 +13,12 @@ namespace FreakyFashion.API.Controllers;
 [Route("api/cart")]
 public class CartsController : ControllerBase
 {
+    private readonly ILogger<CartsController> _logger;
     private readonly AppDbContext _db;
 
-    public CartsController(AppDbContext db)
+    public CartsController(ILogger<CartsController> logger, AppDbContext db)
     {
+        _logger = logger;
         _db = db;
     }
 

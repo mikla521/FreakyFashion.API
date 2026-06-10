@@ -13,10 +13,12 @@ namespace FreakyFashion.API.Controllers;
 [Route("api/products")]
 public class ProductsController : ControllerBase
 {
+    private readonly ILogger<ProductsController> _logger;
     private readonly AppDbContext _db;
 
-    public ProductsController(AppDbContext db)
+    public ProductsController(ILogger<ProductsController> logger, AppDbContext db)
     {
+        _logger = logger;
         _db = db;
     }
 
@@ -28,6 +30,8 @@ public class ProductsController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10)
     {
+        _logger.LogInformation("Fetching products.");
+
         if (slug is not null)
         {
             var bySlug = await _db.Products

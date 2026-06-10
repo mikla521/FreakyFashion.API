@@ -8,11 +8,13 @@ namespace FreakyFashion.API.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
+    private readonly ILogger<AuthController> _logger;
     private readonly TokenService _tokenService;
     private readonly IConfiguration _config;
 
-    public AuthController(TokenService tokenService, IConfiguration config)
+    public AuthController(ILogger<AuthController> logger, TokenService tokenService, IConfiguration config)
     {
+        _logger = logger;
         _tokenService = tokenService;
         _config = config;
     }
