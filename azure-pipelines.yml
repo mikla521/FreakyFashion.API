@@ -4,10 +4,31 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  imageName: 'freakyfashion-api'
+  registry: 'mcratzacr.azurecr.io'
+  tag: '$(Build.BuildId)'
+
 steps:
 
 - checkout: self
 
-- script: |
-    docker build -t freakyfashion-api:test .
-  displayName: 'Build Docker image'
+# 1. Build image
+- task: Docker@2
+  displayName: Build image
+  inputs:
+    command: build
+    repository: $(imageName)
+    dockerfile: Dockerfile
+    tags: |
+      $(tag)
+
+# 2. Push image to ACR
+- task: Docker@2
+  displayName: Push image to ACR
+  inputs:
+    command: push
+    repository: $(imageName)
+    containerRegistry: 'mcratzacr'
+    tags: |
+      $(tag)
