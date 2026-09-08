@@ -1,0 +1,36 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'freakyfashion-api'
+  tag: '$(Build.BuildId)'
+  service: 'azure-freakyfashion'
+
+steps:
+
+- checkout: self
+
+- task: Docker@2
+  displayName: Build and push to ACR
+  inputs:
+    command: buildAndPush
+    containerRegistry: 'mcratzacr'
+    repository: $(imageName)
+    dockerfile: Dockerfile
+    tags: |
+      $(tag)
+
+- task: AzureCLI@2
+  displayName: Deploy to Container App
+  inputs:
+    azureSubscription: $(service)
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      az containerapp update \
+        --name freakyfashion-api \
+        --resource-group rg_freakyfashion \
+        --image mcratzacr.azurecr.io/freakyfashion-api:$(tag)
